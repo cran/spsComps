@@ -40,6 +40,7 @@ additional trigger method, default "hover". Original method only works with
 \examples{
 if(interactive()){
     library(shiny)
+    library(magrittr)
     ui <- fluidPage(
         column(2),
         column(
@@ -55,7 +56,20 @@ if(interactive()){
                     title = "title b",
                     content = "popover works on a link",
                     placement = "bottom"
-                )
+                ),
+            div(
+              tags$b("general element"),
+              style =
+                '
+              height: 100px;
+              background-color: cornflowerblue;
+            '
+            ) \%>\%
+              bsHoverPopover(
+                title = "general element",
+                content = "popover works on a 'div'",
+                placement = "right"
+              )
         )
 
     )

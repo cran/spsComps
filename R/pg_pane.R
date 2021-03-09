@@ -1,5 +1,4 @@
 #' @rdname pgPaneUpdate
-#' @importFrom shinydashboardPlus timelineBlock timelineLabel
 #' @importFrom shinyWidgets progressBar
 #'
 #' @param titles labels to display for each progress, must have the same length
@@ -50,26 +49,30 @@ pgPaneUI <-function(
                 )
         )
     }) %>% {
-        shinydashboardPlus::timelineBlock(reversed = FALSE,
-                                          id = glue("{pane_id}-timeline"),
-                                          .,
-                                          shinydashboardPlus::timelineLabel(
-                                              id = glue("{pane_id}-pg-label"),
-                                              "Ready",
-                                              color = "orange"),
-                                          div(style = "margin-left: 60px; margin-right: 15px;",
-                                              shinyWidgets::progressBar(
-                                                  glue("{pane_id}-pg-all"), striped = TRUE,
-                                                  status = "primary", 0
-                                              )
-                                          )
+
+      tags$ul(
+        class="timeline",
+        id = glue("{pane_id}-timeline"),
+        .,
+        tags$li(
+          class="time-label",
+          tags$span(id=glue("{pane_id}-pg-label"), class="bg-orange", "Ready")
+        ),
+        div(style = "margin-left: 60px; margin-right: 15px;",
+            shinyWidgets::progressBar(
+              glue("{pane_id}-pg-all"), striped = TRUE,
+              status = "primary", 0
+            )
         )
+      )
+
     } %>% {
-        div(class = "tab-pane", id = glue("{pane_id}-pg-container"),
+        div(class = "tab-pane sps-pg-panel", id = glue("{pane_id}-pg-container"),
+            style = glue('top: {top}; right: {right}'),
             absolutePanel(
                 top = top, right = right, draggable = TRUE, width = "310",
                 height = "auto", class = "control-panel", cursor = "inherit",
-                style = "background-color: white; z-index:999;",
+                style = "background-color: rgb(253, 253, 253); z-index:999;",
                 fluidRow(
                     column(3),
                     column(7, h4(title_main)),
@@ -84,8 +87,7 @@ pgPaneUI <-function(
                 div(class = if(opened) "collapse in" else "collapse",
                     id = glue("{pane_id}-pg-collapse"), .)
             ),
-            spsDepend("shinydashboard", js = FALSE),
-            spsDepend("AdminLTE", js = FALSE),
+            spsDepend("basic", js = FALSE),
             spsDepend("update_pg"),
             spsDepend("font-awesome"),
             spsDepend("bttn"),
@@ -97,9 +99,6 @@ pgPaneUI <-function(
 #' A draggable progress panel
 #' @description  Creates a panel that displays multiple progress items.
 #' Use [pgPaneUI] on UI side and use `pgPaneUpdate` to update it.
-#' The UI only
-#' renders correctly inside [shinydashboard::dashboardPage()] or
-#' [shinydashboardPlus::dashboardPagePlus()].
 #'
 #' A overall progress is automatically calculated on the bottom.
 #' @param pane_id Progress panel main ID, use `ns` wrap it on `pgPaneUI` but not

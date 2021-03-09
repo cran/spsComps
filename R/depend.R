@@ -8,8 +8,6 @@
 #' @details For `dep`, current options are:
 #'
 #' - basic: spsComps basic css and js
-#' - shinydashboard: shinydashboard package, css and js
-#' - AdminLTE: shinydashboard package, often used together with "shinydashboard", css and js
 #' - update_pg: spsComps [pgPaneUpdate] function required, js only
 #' - update_timeline: spsComps [spsTimeline] function required, js only
 #' - font-awesome: font-awesome, css only
@@ -23,8 +21,7 @@
 #'
 #' @examples
 #' spsDepend("basic")
-#' # shinydashboard has both js and css and if we only want to use css:
-#' spsDepend("shinydashboard", css = FALSE)
+#' spsDepend("font-awesome")
 #' # Then add it to your shiny app
 #' if(interactive()){
 #'     library(shiny)
@@ -58,42 +55,6 @@ spsDepend <- function(dep, js = TRUE, css = TRUE) {
                     src = c(href = "spsComps", file = "assets"),
                     stylesheet = "css/sps-comps.css",
                     all_files = FALSE
-                )
-                list(
-                    if (js) js_file else NULL,
-                    if (css) css_file else NULL
-                )
-            },
-            "shinydashboard" = {
-                js_file <- htmltools::htmlDependency(
-                    name = "shinydashboard-js",
-                    version = packageVersion("shinydashboard"),
-                    src = c(file = system.file(package = "shinydashboard")),
-                    script = "shinydashboard.js"
-                )
-                css_file <- htmltools::htmlDependency(
-                    name = "shinydashboard-css",
-                    version = packageVersion("shinydashboard"),
-                    src = c(file = system.file(package = "shinydashboard")),
-                    stylesheet = "shinydashboard.css"
-                )
-                list(
-                    if (js) js_file else NULL,
-                    if (css) css_file else NULL
-                )
-            },
-            "AdminLTE" = {
-                js_file <- htmltools::htmlDependency(
-                    name = "AdminLTE-js",
-                    version = "2.0.6",
-                    src = c(file = system.file("AdminLTE", package = "shinydashboard")),
-                    script = "app.min.js",
-                )
-                css_file <- htmltools::htmlDependency(
-                    name = "AdminLTE-css",
-                    version = "2.0.6",
-                    src = c(file = system.file("AdminLTE", package = "shinydashboard")),
-                    stylesheet = "AdminLTE.css"
                 )
                 list(
                     if (js) js_file else NULL,
