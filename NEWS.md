@@ -1,3 +1,40 @@
+# spsComps 0.2.0
+
+## New features
+
+-   `animateIcon`: create font-awesome icons with animations!
+
+-   `animateUI`, `animateServer`: add animations to any HTML/Shiny element, one is called from the UI, one is called from the server side.
+
+-   `animationRemove`: remove animations of an element, call from server only.
+
+-   Loaders: 12 different loaders to indicate busy status.
+
+    -   `cssLoader`: UI side function, directly add the load on UI when app starts
+
+    -   `addLoader`: server side function, add loaders dynamically and control show and hide of the loader.
+
+-   `shinyCatch`: now has this argument `trace_back`. It will log detailed traceback information on console if enabled. Similar to Rstudio's built-in traceback, it shows the function calls and file+line number if there is any.
+
+-   Add target_blank argument for `gallery`, `hrefTab`, `hrefTable`, `hexLogo` and `hexPanel`: if `TRUE`, add `target="_blank"` to the link.
+
+## Major Change
+
+-   `gallery`:
+
+    -   Change the `object-fil` of images from "cover" to "fill".
+
+    -   Now image captions without link will be not clickable and color black.
+
+    -   galleries with `enlarge` turned on will still have hover effects on all images but captions will be not clickable and color black for images without a link.
+
+## Minor Change
+
+## Bug fix
+
+-   `bsHoverPopover` now works on `body` tag instead of within the target element so that it will not be hidden if the parent of target has some overflow settings.
+-   `gallery`: Fix the height matching issues by adding the caption height in calculation. Now all images should be in the supposed rows.
+
 # spsComps 0.1.1
 
 ## Bug fix

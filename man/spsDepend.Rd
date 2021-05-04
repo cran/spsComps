@@ -4,7 +4,7 @@
 \alias{spsDepend}
 \title{Add commonly used HTML dependencies}
 \usage{
-spsDepend(dep, js = TRUE, css = TRUE)
+spsDepend(dep, js = TRUE, css = TRUE, listing = TRUE)
 }
 \arguments{
 \item{dep}{dependency names, see details}
@@ -12,17 +12,23 @@ spsDepend(dep, js = TRUE, css = TRUE)
 \item{js}{bool, use only javascript from this resource if there are both js and css files?}
 
 \item{css}{bool, use only CSS from this resource if there are both js and css files?}
+
+\item{listing}{bool, if your \code{dep} is invalid, list all options? \code{FALSE} will
+mute it.}
 }
 \value{
 \link[htmltools:htmlDependency]{htmltools::htmlDependency} object
 }
 \description{
-Mostly used in SPS internal development
+Mostly used in SPS internal development or add dependencies for
+some server end functions. For most UI functions, the dependency has been automatically
+attached for you.
 }
 \details{
 For \code{dep}, current options are:
 \itemize{
 \item basic: spsComps basic css and js
+\item css_loading: for css loaders
 \item update_pg: spsComps \link{pgPaneUpdate} function required, js only
 \item update_timeline: spsComps \link{spsTimeline} function required, js only
 \item font-awesome: font-awesome, css only
@@ -30,9 +36,15 @@ For \code{dep}, current options are:
 \item toastr: comes from shinytoastr package, toastr.js, css and js
 \item pop-tip: enable enhanced bootstrap popover and tips, required for \link{bsHoverPopover} function
 \item gotop: required by \link{spsGoTop} function
+\item animation:  required for animation related functions to add animations
+for icons and other elements
+\item css-loader: required for loader functions
 }
 }
 \examples{
+# list all options
+spsDepend("")
+# try some options
 spsDepend("basic")
 spsDepend("font-awesome")
 # Then add it to your shiny app
