@@ -1,3 +1,39 @@
+# spsComps 0.3.0
+
+## New features
+
+-   Add `animateAppend`, which allows users to add animations by pipe `%>%`
+
+-   Add `animateAppendNested`, which allows users to add multiple animations to the same element by pipe `%>%`.
+
+-   Custom loaders supported. A new `type`, `"gif"` is added to all loader functions. Users can choose this type and specify a remote URL or a local path to the gif file with the `src` argument to create their own custom loaders.
+
+-   Rewrite `bsHoverPopover` and name it `bsPopover` and it's higher higher wrapper `bsPop`. This function allow users to create bootstrap3 Popover with deep customization, color, background, text size and more for each individual of them.
+
+-   New function `bsTooltip` and `bsTip`: add a custom tooltip to any Shiny/ Rmarkdown element you want. You can change color, font size, position and more for each individual tooltip.
+
+## Major change
+
+-   Rewrite methods in `addLoader` class.
+
+    -   Now it add the load to the document when first time `show` method is called instead of on class initialization. This solves the problem that some elements are not visible on app start so javascript functions cannot catch the dimensions to do the calculation.
+
+    -   Add 2 new methods, `recreate` and `destroy`:
+
+        -   `destroy` will remove the loader from the app (client side)
+
+        -   `recreate` = `hide` + `destroy` + create a new loader, users can change type, color, method, etc and recalculate the loader dimensions.
+
+    -   to reduce dependencies `loadDF`, `dynamicFile` and `dynamicFileServer` are moved to systemPipeShiny main package.
+
+    -   Rewrite `spsTitle` and `spsHr`, now you can create colorful titles and horizontal divider lines with these two functions respectively.
+
+## Minor change
+
+-   add `…` argument to the `animateIcon`. Users can append additional attributes.
+-   Now `animationRemove` can also remove animations add by `animateUI` and `animateIcon` functions.
+-   Internal rewrite some functions so removed some imported packages.
+
 # spsComps 0.2.0
 
 ## New features

@@ -1,6 +1,6 @@
 
 // get loader div
-function chooseLoader(id, type, color, width, height){
+function chooseLoader(id, type, src, color, width, height){
   var types = {
     //
     "circle"   :
@@ -416,21 +416,33 @@ function chooseLoader(id, type, color, width, height){
             background: ${color};
         }
       </style>
-      `
+      `,
+    "gif":
+    `
+    <div class="sps-loader-gif">
+      <img src=${src} style="height: ${height}; width: ${width}"><img>
+    </div>
+    `
   }
   return types[type] || '<div>type not found</div>';
 }
 
-
 Shiny.addCustomMessageHandler('sps-add-loader', function(data) {
-  // selector,id ,type ,height ,width ,method , bgColor,
+  // selector,id ,type, src, height ,width ,method , bgColor,
   // color ,opacity ,block , center, footer, zIndex, alert
+
+  // skip if loader is created
+  //console.log($(`#${data.id}-container`).length)
+  if($(`#${data.id}-container`).length) return(true);
+
   //get element
   var el = data.method !== 'full_screen' ? $(data.selector) : $(document);
   if (el.length != 1) {
     if (data.alert) alert("Loader: Cannot find element or more than one match");
     throw new Error("Loader: Cannot find element or more than one match");
   }
+  // console.log(el)
+  // console.log(el.is(':visible'))
   var el_height = el.height(); el_width = el.width();
   var el_short = el_height > el_width ? el_width : el_height;
   var loader_divider = el_short < 100 || (data.height && data.width)? 10 : 20;
@@ -438,52 +450,57 @@ Shiny.addCustomMessageHandler('sps-add-loader', function(data) {
   var loader_width = data.width ? data.width :`${(el_short - 5)/loader_divider}rem`;
 
   if (el_height <= 0 || el_width <= 0) {
-    if (data.alert) alert("Loader: element does not have height or width");
-    throw new Error("Loader: element does not have height or width");
+    let msg = `Loader: element '${data.selector}' does not have height or width, maybe it is not visible`
+    if (data.alert) console.log(msg);
+    throw new Error(msg);
   }
+  //console.log('loader added')
+  loaderInit(data, el, loader_height, loader_width)
 
+});
+
+function loaderInit(data, el, loader_height, loader_width) {
   switch (data.method) {
-  case 'replace':
-    loaderReplace(
-      el, data.id,
-      loader_height,
-      loader_width,
-      data.opacity,
-      data.center,
-      data.block,
-      data.footer
-    );
-    break;
-  case 'inline':
-    loaderInline(
-      el, data.id,
-      loader_height,
-      loader_width,
-      data.opacity,
-      data.center
-    );
-    break;
-  case 'full_screen':
-    loaderFullscreen(
-      data.id, loader_width, loader_height,
-      data.opacity, data.center, data.block,
-      data.footer, data.zIndex, data.bgColor
-    );
-    break;
+    case 'replace':
+      loaderReplace(
+        el, data.id,
+        loader_height,
+        loader_width,
+        data.opacity,
+        data.center,
+        data.block,
+        data.footer
+      );
+      break;
+    case 'inline':
+      loaderInline(
+        el, data.id,
+        loader_height,
+        loader_width,
+        data.opacity,
+        data.center
+      );
+      break;
+    case 'full_screen':
+      loaderFullscreen(
+        data.id, loader_width, loader_height,
+        data.opacity, data.center, data.block,
+        data.footer, data.zIndex, data.bgColor
+      );
+      break;
   }
 
   var loader = chooseLoader(
-    data.id, data.type, data.color,
-    loader_height,
-    loader_width,
+    data.id, data.type, data.src,
+    data.color, loader_width, loader_height
   );
   $(`#${data.id}`).prepend(loader);
-
-});
+}
 
 function loaderReplace(el, id, loader_height, loader_width, opacity, center, block, footer) {
   var newEl = el.clone().empty();
   newEl.attr('id', `${id}-container`);
+  newEl.removeClass("shiny-plot-output shiny-bound-output");
   newEl.attr('is-inline', el.css('display').includes('inline') ? true : false);
   newEl.css({display: 'none', opacity: opacity});
   if (block) newEl.attr('disabled','disabled');
@@ -554,19 +571,18 @@ function loaderFullscreen(
 }
 
 Shiny.addCustomMessageHandler('sps-toggle-loader', function(data) {
-  //selector,id ,state, method, alert
+  //data + state
+  // console.log(data)
   var el = $(data.selector);
   if (el.length != 1) {
     let msg = `Loader: Cannot find target '${data.selector}' or more than one match`
     if (data.alert) alert(msg);
     throw new Error(msg);
   }
-  var loader = $(`#${data.id}`);
-  console.log(loader)
-  console.log(loader.length)
+  var loader = $(`#${data.id}-container`);
 
   if (loader.length != 1 && data.method != "full_screen") {
-    let msg = `Loader: Cannot find loader '${data.id}' or more than one match`
+    let msg = `Loader: Cannot find loader '${data.id}-container' or more than one match`
     if (data.alert) alert(msg);
     throw new Error(msg);
   }
@@ -603,6 +619,10 @@ Shiny.addCustomMessageHandler('sps-toggle-loader', function(data) {
       break;
     }
   }
-})
+});
 
+Shiny.addCustomMessageHandler('sps-remove-loader', function(data) {
+  // id
 
+  $(`#${data.id}-container`).remove()
+});

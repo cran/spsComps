@@ -14,8 +14,8 @@ and when it finishes, remove the loader to indicate clear status.
 \examples{
 if (interactive()){
   ui <- fluidPage(
-    spsDepend("css-loader"),
     h4("Use buttons to show and hide loaders with different methods"),
+    spsDepend("css-loader"), # required
     tags$b("Replace"), br(),
     actionButton("b_re_start", "Replace"),
     actionButton("b_re_stop", "stop replace"),
@@ -89,12 +89,12 @@ if (interactive()){
 
 if (interactive()){
   ui <- bootstrapPage(
-    spsDepend("css-loader"),
+    spsDepend("css-loader"), # required
     h4("Add loaders to Shiny `render` events"),
     tags$b("Replace"), br(),
-    selectInput(inputId = "n_re",
-                label = "Change this to render the following plot",
-                choices = c(10, 20, 35, 50)),
+    selectizeInput(inputId = "n_re",
+                   label = "Change this to render the following plot",
+                   choices = c(10, 20, 35, 50)),
     plotOutput(outputId = "p_re"),
     br(), tags$b("Full screen"), br(),
     selectInput(inputId = "n_fs",
@@ -105,16 +105,18 @@ if (interactive()){
 
   server <- function(input, output, session) {
     # create loaders
-    p_re <- addLoader$new("p_re", type = "facebook")
-    p_fs <- addLoader$new(
+    l_re <- addLoader$new("p_re")
+    l_fs <- addLoader$new(
       "p_fs", color = "pink", method = "full_screen",
       bg_color = "#eee", height = "30rem", type = "grid",
       footer = h4("Replotting...")
     )
     # use loaders in rednering
     output$p_re <- renderPlot({
-      on.exit(p_re$hide())
-      p_re$show()
+      on.exit(l_re$hide())
+      # to make it responsive
+      # (always create a new one by calculating the new height and width)
+      l_re$recreate()$show()
       Sys.sleep(1)
       hist(faithful$eruptions,
            probability = TRUE,
@@ -123,8 +125,9 @@ if (interactive()){
            main = "Geyser eruption duration")
     })
     output$p_fs <- renderPlot({
-      on.exit(p_fs$hide())
-      p_fs$show()
+      on.exit(l_fs$hide())
+      l_fs$show()
+
       Sys.sleep(1)
       hist(faithful$eruptions,
            probability = TRUE,
@@ -142,6 +145,8 @@ if (interactive()){
 \item \href{#method-new}{\code{addLoader$new()}}
 \item \href{#method-show}{\code{addLoader$show()}}
 \item \href{#method-hide}{\code{addLoader$hide()}}
+\item \href{#method-destroy}{\code{addLoader$destroy()}}
+\item \href{#method-recreate}{\code{addLoader$recreate()}}
 \item \href{#method-clone}{\code{addLoader$clone()}}
 }
 }
@@ -155,6 +160,7 @@ create a loader object
   target_selector = "",
   isID = TRUE,
   type = "default",
+  src = "",
   id = "",
   height = NULL,
   width = height,
@@ -180,17 +186,26 @@ for example, you have a button and want to add animation to it:\preformatted{act
 }
 
 This function is used in server only, so if you are in shiny module,
-\strong{DO NOT} add the \code{ns()} wrapper.}
+use \code{ns()} for ID on UI but \strong{DO NOT} add the \code{ns()} wrapper on server.
+
+UI\preformatted{actionButton(inputId = ns("btn"))
+}
+
+server\preformatted{addLoader$new(target_selector = "btn", ...)
+}}
 
 \item{\code{isID}}{bool, is your selector an ID?}
 
 \item{\code{type}}{string, one of  "circle", "dual-ring", "facebook", "heart",
 "ring", "roller", "default", "ellipsis", "grid", "hourglass", "ripple",
-"spinner", default is "default".}
+"spinner", "gif", default is "default".}
+
+\item{\code{src}}{string, online URL or local path of the gif animation file if
+you would like to upload your own loader.}
 
 \item{\code{id}}{string, the unqiue ID for the loader, if not provided, a random
-ID will be given. If you are using shiny modules, use \code{session$ns('YOUR_ID')}
-to wrap it.}
+ID will be given. If you are using shiny modules, DO NOT use \code{session$ns('YOUR_ID')}
+to wrap it. Loaders live on the top level of the document.}
 
 \item{\code{height}}{string, (r)em, "1.5rem", "1.5em", or pixel, like "10px".
 Default is \code{NULL}, will be automatically calculated based on the target
@@ -247,6 +262,19 @@ This method requires the \code{height} to be specified manually. Under this meth
 \code{bg_color} and \code{z_index} can also be changed.
 }
 }
+
+\subsection{New container}{
+
+\code{addLoader$new()} method only stores the loader information, the loader is
+add to your docuement upon the first time \code{addLoader$show()} is called.
+}
+
+\subsection{Required javascript and css files}{
+
+Unfortunately, js and css required by this function cannot be added automatically from
+the server end. These files have to be added before app start. Add
+\code{spsDepend('css-loader')} somewhere in your UI to add the dependency.
+}
 }
 
 \subsection{Returns}{
@@ -270,6 +298,13 @@ alert on UI? For debugging purposes.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Make sure your target element is visible when the time you call this \code{show}
+method, otherwise, you will not get it if height and width is rely on
+auto-calculation for "replace" and "inline" method. "full_screen" method
+is not affected.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-hide"></a>}}
@@ -288,6 +323,110 @@ alert on UI? For debugging purposes.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-destroy"></a>}}
+\if{latex}{\out{\hypertarget{method-destroy}{}}}
+\subsection{Method \code{destroy()}}{
+Destroy current loader
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{addLoader$destroy(alert = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{alert}}{bool, if the target selector or loader is not found,
+alert on UI? For debugging purposes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+hide and remove current loader from the current document
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-recreate"></a>}}
+\if{latex}{\out{\hypertarget{method-recreate}{}}}
+\subsection{Method \code{recreate()}}{
+recreate the loader
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{addLoader$recreate(
+  type = "default",
+  src = NULL,
+  id = "",
+  height = NULL,
+  width = height,
+  color = "#337ab7",
+  opacity = 1,
+  method = "replace",
+  block = TRUE,
+  center = TRUE,
+  bg_color = "#eee",
+  footer = NULL,
+  z_index = 2000,
+  alert = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{string, one of  "circle", "dual-ring", "facebook", "heart",
+"ring", "roller", "default", "ellipsis", "grid", "hourglass", "ripple",
+"spinner", "gif", default is "default".}
+
+\item{\code{src}}{string, online URL or local path of the gif animation file if
+you would like to upload your own loader.}
+
+\item{\code{id}}{string, the unqiue ID for the loader, if not provided, a random
+ID will be given. If you are using shiny modules, DO NOT use \code{session$ns('YOUR_ID')}
+to wrap it. Loaders live on the top level of the document.}
+
+\item{\code{height}}{string, (r)em, "1.5rem", "1.5em", or pixel, like "10px".
+Default is \code{NULL}, will be automatically calculated based on the target
+component. It is recommend to use \code{NULL} for "replace" and "inline" method
+to let it automatically be calculated, but required for "full_screen" method.}
+
+\item{\code{width}}{string, default is the same as \code{height} to make it square.}
+
+\item{\code{color}}{string, any valid CSS color name, or hex color code}
+
+\item{\code{opacity}}{number, between 0-1}
+
+\item{\code{method}}{one of "replace", "inline", "full_screen", see details}
+
+\item{\code{block}}{bool, for some input components, once the loader starts,
+it can also block user interaction with the component, very useful for
+"inline" method, eg. prevent users from clicking the button while some
+process is still running.}
+
+\item{\code{center}}{bool, try to place the load to the center of the target for
+"inline" and "replace" and center of the screen for "full_screen".}
+
+\item{\code{bg_color}}{string, any valid CSS color name, or hex color code. Only
+works for "full_screen" method.}
+
+\item{\code{footer}}{Additional Shiny/HTML component to add below the loader, like
+a title \code{h1("load title")}. \code{inline} method does not have a footer.}
+
+\item{\code{z_index}}{number, only works for "full_screen" method, what CSS layer
+should the overlay be places. In HTML, all elements have the default of 0.}
+
+\item{\code{alert}}{bool, should alert if target cannot be found or other javascript
+errors? mainly for debugging}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This method will first disable then destroy (remove) current loader,
+and finally store new information of the new loader.
+
+\strong{Note:}: this method only refresh loader object on the server, the loader
+is \strong{not} recreated until the next time \code{show} method is called.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

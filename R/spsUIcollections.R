@@ -509,7 +509,7 @@ hrefTable <- function(item_titles,
 #'     shinyApp(ui, server)
 #' }
 renderDesc <- function(id, desc) {
-    tagList(
+    div(
         HTML(glue('
         <div class="desc">
           <div class="collapse desc-body" id="{id}" aria-expanded="false">
@@ -525,15 +525,6 @@ renderDesc <- function(id, desc) {
     )
 }
 
-
-#' hr line with color #3b8dbc38
-#' @export
-#' @return HTML <hr> element
-#' @examples
-#' spsHr()
-spsHr <- function() {
-    hr(style ='border: 0.5px solid #3b8dbc38;')
-}
 
 
 #' @rdname hexPanel
@@ -635,7 +626,7 @@ hexLogo <- function(
 #' `footer_links` has the same required length.
 #'
 #' @export
-#' @return HTML elements
+#' @return HTML elements, tagList
 #' @importFrom assertthat not_empty assert_that
 #' @examples
 #' if(interactive()){
@@ -728,173 +719,6 @@ hexPanel <-function(
   }
 }
 
-#' h2 title with bootstrap info color
-#' @description Mostly used under SPS framework to create the tab title.
-#' @param title title text
-#' @param ... other attributes and children to this element
-#' @return a h2 level heading with bootstrap4 "info" color(bt4 color not the
-#' default bt3 info color)
-#' @export
-#'
-#' @examples
-#' tabTitle("This title")
-tabTitle <- function(title, ...){
-    h2(title, style = "color:#17a2b8;", ...)
-}
-
-
-
-#' Bootstrap popover trigger on hover instead of click
-#' @description enhanced Bootstrap 3 popover by hovering, see
-#' [bsplus::bs_embed_popover] for details. Everything is similar but has
-#' additional trigger method, default "hover". Original method only works with
-#' "click" on buttons.
-#' @param tag [htmltools::tag], generally htmltools::tags$button() or htmltools::tags$a(),
-#' or [shiny::actionButton()]
-#' @param title character, title for the popover, generally text
-#' @param content character, content for the popover body, can be HTML
-#' @param placement character, placement of the popover with respect to `tag`
-#' @param trigger trigger method, default "hover", one of click | hover |
-#' focus | manual.
-#' @param ... other named arguments, passed to [bsplus::bs_set_data()]
-#' @importFrom bsplus bs_embed_popover
-#' @return shiny element
-#' @export
-#'
-#' @examples
-#' if(interactive()){
-#'     library(shiny)
-#'     library(magrittr)
-#'     ui <- fluidPage(
-#'         column(2),
-#'         column(
-#'             8,
-#'             actionButton('a', 'On button') %>%
-#'                 bsHoverPopover(
-#'                     title = "title a",
-#'                     content = "popover works on a button",
-#'                     placement = "bottom"
-#'                 ),
-#'             tags$a("On link") %>%
-#'                 bsHoverPopover(
-#'                     title = "title b",
-#'                     content = "popover works on a link",
-#'                     placement = "bottom"
-#'                 ),
-#'             div(
-#'               tags$b("general element"),
-#'               style =
-#'                 '
-#'               height: 100px;
-#'               background-color: cornflowerblue;
-#'             '
-#'             ) %>%
-#'               bsHoverPopover(
-#'                 title = "general element",
-#'                 content = "popover works on a 'div'",
-#'                 placement = "right"
-#'               )
-#'         )
-#'
-#'     )
-#'     server <- function(input, output, session) {}
-#'     shinyApp(ui, server)
-#' }
-bsHoverPopover <- function(
-    tag, title = NULL, content = NULL, placement = "top", trigger="hover", ...){
-    tagList(
-        bsplus::bs_embed_popover(
-            tag, title = title, content = content, placement = placement, ...) %>%{
-                if(trigger == "hover")
-                    tagAppendAttributes(., `pop-toggle` = trigger)
-                else tagAppendAttributes(., `data-trigger` = trigger)
-            },
-        spsDepend("pop-tip")
-    )
-}
-
-
-# internal css loader unit
-spsLoader <- function(id=NULL){
-    if(is.null(id)) id = paste0("loader", sample(1000000, 1))
-    tagList(
-        singleton(
-            tags$style('
-            .sps-loader {
-              height: auto;
-              display: inline-block;
-              align-items: center;
-              justify-content: center;
-            }
-            .sps-loader .container {
-              width: 80px;
-              height: 60px;
-              text-align: center;
-              font-size: 10px;
-            }
-            .sps-loader .container .boxLoading {
-              background-color: #3c8dbc;
-              height: 100%;
-              width: 6px;
-              display: inline-block;
-              -webkit-animation: sps-loading 1.2s infinite ease-in-out;
-              animation: sps-loading 1.2s infinite ease-in-out;
-            }
-            .sps-loader .container .boxLoading2 {
-              -webkit-animation-delay: -1.1s;
-              animation-delay: -1.1s;
-            }
-            .sps-loader .container .boxLoading3 {
-              -webkit-animation-delay: -1s;
-              animation-delay: -1s;
-            }
-            .sps-loader .container .boxLoading4 {
-              -webkit-animation-delay: -0.9s;
-              animation-delay: -0.9s;
-            }
-            .sps-loader .container .boxLoading5 {
-              -webkit-animation-delay: -0.8s;
-              animation-delay: -0.8s;
-            }
-
-            @-webkit-keyframes sps-loading {
-              0%,
-              40%,
-              100% {
-                -webkit-transform: scaleY(0.4);
-              }
-              20% {
-                -webkit-transform: scaleY(1);
-              }
-            }
-            @keyframes sps-loading {
-              0%,
-              40%,
-              100% {
-                transform: scaleY(0.4);
-                -webkit-transform: scaleY(0.4);
-              }
-              20% {
-                transform: scaleY(1);
-                -webkit-transform: scaleY(1);
-              }
-            }
-          ')
-        ),
-        tags$div(
-            id = id, class = "sps-loader",
-            HTML('
-            <div class="container">
-                <div class="boxLoading boxLoading1"></div>
-                <div class="boxLoading boxLoading2"></div>
-                <div class="boxLoading boxLoading3"></div>
-                <div class="boxLoading boxLoading4"></div>
-                <div class="boxLoading boxLoading5"></div>
-            </div>
-           ')
-        )
-    )
-}
 
 
 #' Match height of one element to the other element
@@ -907,7 +731,7 @@ spsLoader <- function(id=NULL){
 #' @param isID bool, if `TRUE`, `div1` and `div2` will be treated as ID, otherwise
 #' you can use complex jquery selector
 #'
-#' @return will be run as javascript
+#' @return tagList containing javascript
 #' @export
 #'
 #' @examples
@@ -1070,7 +894,7 @@ spsGoTop <- function(
 #' 2. You could update the code inside the collapse use [shinyAce::updateAceEditor]
 #' on server, the code block ID is button ID + "-ace", like "my_button-ace" . See
 #' examples.
-#' @return a shiny element
+#' @return a shiny tagList
 #' @export
 #'
 #' @examples
@@ -1215,19 +1039,16 @@ spsCodeBtn <- function(
             inputId = id,
             label = label,
             icon = btn_icon,
-            `data-toggle`="tooltip",
-            title = tool_tip,
-            `data-placement` = placement,
             style = btn_style,
             ...
         )
-    )
+    ) %>% bsTooltip(title = tool_tip, placement = placement)
     if (display == "modal") {
-        display_el <- bsplus::bs_modal(
-            id = paste0(id, "-modal"),
+        display_el <- bsModal(
+            id = id,
             title = title,
             size = size,
-            body = shinyAce::aceEditor(
+            shinyAce::aceEditor(
                 outputId = paste0(id, "-ace"),
                 value = glue(.open = '@{', .close = '}@', glue_collapse(code)),
                 mode = language,
@@ -1235,11 +1056,14 @@ spsCodeBtn <- function(
                 fontSize = "14"
             )
         )
-        btn <- btn %>% bsplus::bs_attach_modal(id_modal = paste0(id, "-modal"))
+        btn <- btn %>% htmltools::tagAppendAttributes(
+          `data-toggle`="modal",
+          `data-target`= paste0('#', id, '-modal')
+        )
     } else {
-        display_el <- bsplus::bs_collapse(
-            id = paste0(id, "-collapse"),
-            content = div(
+        display_el <- bsCollapse(
+            id = id,
+            div(
                 h4(class="modal-title", title),
                 shinyAce::aceEditor(
                     outputId = paste0(id, "-ace"),
@@ -1250,7 +1074,12 @@ spsCodeBtn <- function(
                 )
             )
         )
-        btn <- btn %>% bsplus::bs_attach_collapse(id_collapse = paste0(id, "-collapse"))
+        btn <- btn %>% htmltools::tagAppendAttributes(
+          `data-toggle`="collapse",
+          `aria-expanded`="false",
+          `aria-controls`= paste0(id, '-collapse'),
+          `data-target`= paste0('#', id, '-collapse')
+        )
     }
     tagList(
         btn,
@@ -1260,56 +1089,61 @@ spsCodeBtn <- function(
     )
 }
 
+bsModal <- function(id, ..., title="title",
+                    size=c('normal', 'large', 'small'),
+                    confirmbtn = FALSE,
+                    confirmbtn_id = paste0(id, "-confirm"),
+                    confirmbtn_text = "confirm"
+){
+  size <- switch(size[1],
+                 'large' = 'modal-lg',
+                 'small' = 'modal-sm',
+                 ''
+  )
+  div(
+    class="modal fade", id= paste0(id, "-modal"), tabindex="-1", role="dialog",
+    `aria-labelledby`=paste0(id, "-modal-title"),
+    div(
+      class=paste("modal-dialog", size), role="document",
+      div(
+        class="modal-content",
+        div(
+          class="modal-header",
+          HTML('<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+          '),
+          h4(class="modal-title", id=paste0(id, "-modal-title"), title)
+        ),
+        div(
+          class="modal-body", ...
+        ),
+        div(
+          class="modal-footer",
+          tags$button(type="button", class="btn btn-default", `data-dismiss`="modal", "Close"),
+          if(confirmbtn){
+            tags$button(
+              class = "btn btn-default action-button btn-primary",
+              id = confirmbtn_id,
+              type = "button",
+              confirmbtn_text
+            )
+          } else
+          {div()}
+        )
+      )
+    )
+  )
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+bsCollapse <- function(id, ..., collapsed = FALSE) {
+  div(
+    class = if (collapsed) "collapse in" else "collapse",
+    id = paste0(id, "-collapse"),
+    `aria-expanded` = if (collapsed) "true" else "false",
+    ...
+  )
+}
 
 
 
