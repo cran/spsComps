@@ -9,6 +9,7 @@
 #' with other code blocks. This function is designed to handle these issues.
 #' @details
 #'
+#' #### Blocking
 #' - The blocking works
 #' similar to shiny's [shiny::req()] and [shiny::validate()].
 #' If anything inside fails, it will
@@ -25,11 +26,20 @@
 #' if there is any error, `NULL` will return and following code will continue to
 #' run.
 #'
-#' - To have the message displayed on shiny, `spsDepend("toastr")` must be added
-#' in UI if you are working on you own app not under SPS framework, see examples.
-#' - Messages will be displayed for 3s, 5s for warnings and errors will never
-#' go away on UI unless users' mouse hover on the bar or manually close it.
+#' #### To use it
+#' Since spsComps 0.3.1 to have the message displayed on shiny UI, you don't need
+#' to attach the dependencies manually by adding `spsDepend("shinyCatch")` or
+#' `spsDepend("toastr")` (old name) on UI. This becomes optional, only in the case
+#' that automatic attachment is not working.
+#' #### Display
 #'
+#' Messages will be displayed for 3 seconds, and 5s for warnings. Errors will never
+#' go away on UI unless users' mouse hover on the bar or manually click it.
+#'
+#' #### environment
+#' `shinyCatch` uses the same environment as where it is called, it means if you
+#' assign a variable inside the expression, you can still get it from outside the
+#' `shinyCatch`, see examples.
 #' @param expr expression
 #' @param position client side message bar position, one of:
 #' c("top-right", "top-center", "top-left","top-full-width", "bottom-right",
@@ -60,7 +70,7 @@
 #' @examples
 #' if(interactive()){
 #'   ui <- fluidPage(
-#'     spsDepend("toastr"),
+#'     spsDepend("shinyCatch"), # optional
 #'     h4("Run this example on your own computer to better understand exception
 #'            catch and dual-end logging", class = "text-center"),
 #'     column(
@@ -109,6 +119,9 @@
 #' shinyCatch(message("this message"))
 #' try({shinyCatch(stop("this error")); "no block"}, silent = TRUE)
 #' try({shinyCatch(stop("this error"), blocking_level = "error"); "blocked"}, silent = TRUE)
+#' # get variable from outside
+#' shinyCatch({my_val <- 123})
+#' my_val
 shinyCatch <- function(
   expr,
   position = "bottom-right",
@@ -122,6 +135,7 @@ shinyCatch <- function(
   assert_that(all(is.character(prefix), length(prefix) == 1))
   prefix <- paste0(prefix, if (prefix == "") " " else "-")
   shiny <- all(!is.null(getDefaultReactiveDomain()), shiny)
+  if(shiny) dependServer("toastr")
   toastr_actions <- list(
     message = function(m) {
       msg(m$message, paste0(prefix, "INFO"), "blue")
@@ -144,6 +158,7 @@ shinyCatch <- function(
         title = "There is an error", hideDuration = 300)
     }
   )
+
   switch(tolower(blocking_level),
          "error" = tryCatch(
            suppressMessages(suppressWarnings(withCallingHandlers(
@@ -252,12 +267,14 @@ findTraceFile <- function(calls) {
 #' and no final return, else `TRUE`.
 #' @export
 #' @details
-#' - To have the message displayed on shiny, `spsDepend("toastr")` must be added
-#' in UI if you are working on you own app not under SPS framework, see examples.
+#' - Since spsComps 0.3.1 to have the message displayed on shiny UI, you don't need
+#' to attach the dependencies manually by adding `spsDepend("spsValidate")` or
+#' `spsDepend("toastr")` (old name) on UI. This becomes optional, only in the case
+#' that automatic attachment is not working.
 #' @examples
 #' if(interactive()){
 #'     ui <- fluidPage(
-#'         spsDepend("toastr"), # need to add toastr dependency
+#'         spsDepend("spsValidate"), # optional
 #'         column(
 #'             4,
 #'             h3("click below to make the plot"),
@@ -437,7 +454,7 @@ shinyCheckPkg <-function(
     github_cmd <- if (shinyAce::is.empty(missing_github)) "" else
         paste0(
             'if (!requireNamespace("remotes", quietly=TRUE))
-                install.packages("BiocManager")\n',
+                install.packages("remotes")\n',
             "remotes::install(c('", paste0(missing_github, collapse = "', '"), "'))"
         )
 
@@ -482,4 +499,92 @@ checkNameSpace <- function(packages, quietly = FALSE, from = "CRAN") {
   }
   return(missing_pkgs)
 }
+
+
+
+#' In-line numeric operation for reactiveVal
+#' @description In-place operations like `i += 1`, `i -= 1` is not support in
+#' R. These functions implement these operations in R. This set of functions will
+#' apply this kind of operations on `[shiny::reactiveVal]` objects.
+#' @param react reactiveVal object, when it is called, should return an numeric object
+#' @param value the numeric value to do the operation on `react`
+#' @seealso If you want [shiny::reactiveValues]  version of these operators or just
+#' normal numeric objects, use [spsUtil::inc], [spsUtil::mult], and [spsUtil::divi].
+#' @return No return, will directly change the reactiveVal object provided to the
+#' `react` argument
+#' @details
+#' `incRv(i)` is the same as `i <- i + 1`.
+#' `incRv(i, -1)` is the same as `i <- i - 1`.
+#' `multRv(i)` is the same as `i <- i * 2`.
+#' `diviRv(i)` is the same as `i <- i / 2`.
+#' @export
+#'
+#' @examples
+#' reactiveConsole(TRUE)
+#' rv <- reactiveVal(0)
+#' incRv(rv) # add 1
+#' rv()
+#' incRv(rv) # add 1
+#' rv()
+#' incRv(rv, -1) # minus 1
+#' rv()
+#' incRv(rv, -1) # minus 1
+#' rv()
+#' rv2 <- reactiveVal(1)
+#' multRv(rv2) # times 2
+#' rv2()
+#' multRv(rv2) # times 2
+#' rv2()
+#' diviRv(rv2) # divide 2
+#' rv2()
+#' diviRv(rv2) # divide 2
+#' rv2()
+#' reactiveConsole(FALSE)
+#' # Real shiny example
+#' if(interactive()){
+#'   ui <- fluidPage(
+#'     textOutput("text"),
+#'     actionButton("b", "increase by 1")
+#'   )
+#'   server <- function(input, output, session) {
+#'     rv <- reactiveVal(0)
+#'     observeEvent(input$b, {
+#'       incRv(rv)
+#'     })
+#'     output$text <- renderText({
+#'       rv()
+#'     })
+#'   }
+#'   shinyApp(ui, server)
+#' }
+incRv <- function(react, value = 1) {
+  if(!inherits(react, "reactiveVal")) stop("react must be a 'reactiveVal' object")
+  if(!is.numeric(value)) stop("value must be numeric")
+  react(isolate(react()) + value)
+}
+
+#' @export
+#' @rdname incRv
+multRv <-  function(react, value = 2) {
+  if(!inherits(react, "reactiveVal")) stop("react must be a 'reactiveVal' object")
+  if(!is.numeric(value)) stop("value must be numeric")
+  react(isolate(react()) * value)
+}
+
+
+#' @export
+#' @rdname incRv
+diviRv <-  function(react, value = 2) {
+  if(!inherits(react, "reactiveVal")) stop("react must be a 'reactiveVal' object")
+  if(!is.numeric(value)) stop("value must be numeric")
+  react(isolate(react()) / value)
+}
+
+
+onNextInput <- function(expr, session = getDefaultReactiveDomain()) {
+  observeEvent(once = TRUE, reactiveValuesToList(session$input), {
+    force(expr)
+  }, ignoreInit = TRUE)
+}
+
 

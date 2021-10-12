@@ -1,3 +1,21 @@
+# spsComps 0.3.1
+
+## New Features
+
+-   `incRv`, `multRv`, `diviRv`: reactive in-line numeric operations, like `i += 1`, `i *= 1`.
+-   For server only functions, now attaching the JS and CSS dependency by adding `spsDepend("xxx")` on UI is not required anymore, it becomes optional. This process is handled internally. In case this will not work, users still have the option to attach the dependency manually via `spsDepend`.
+
+## Bug fix
+
+-   fix in `bsTooltip` and `bsPopover`, if text is defined in multiple lines and will cause js conflicts on calling the function. Now all line-change symbols are replaced before sending to js.
+-   Fix some links and bugs in demos.
+-   Fix text in `shinyCheckPkg`.
+-   Fix Font Awesome introduced warnings
+
+## Minor Change
+
+-   Better help and examples for `shinyCatch`.
+
 # spsComps 0.3.0
 
 ## New features

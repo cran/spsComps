@@ -52,6 +52,7 @@ want the app to crash but just stop this code block, inform users and continue
 with other code blocks. This function is designed to handle these issues.
 }
 \details{
+\subsection{Blocking}{
 \itemize{
 \item The blocking works
 similar to shiny's \code{\link[shiny:req]{shiny::req()}} and \code{\link[shiny:validate]{shiny::validate()}}.
@@ -68,16 +69,34 @@ error will be blocked.
 \item If \code{blocking_level} is other than these 3, no exceptions will be block, and
 if there is any error, \code{NULL} will return and following code will continue to
 run.
-\item To have the message displayed on shiny, \code{spsDepend("toastr")} must be added
-in UI if you are working on you own app not under SPS framework, see examples.
-\item Messages will be displayed for 3s, 5s for warnings and errors will never
-go away on UI unless users' mouse hover on the bar or manually close it.
+}
+}
+
+\subsection{To use it}{
+
+Since spsComps 0.3.1 to have the message displayed on shiny UI, you don't need
+to attach the dependencies manually by adding \code{spsDepend("shinyCatch")} or
+\code{spsDepend("toastr")} (old name) on UI. This becomes optional, only in the case
+that automatic attachment is not working.
+}
+
+\subsection{Display}{
+
+Messages will be displayed for 3 seconds, and 5s for warnings. Errors will never
+go away on UI unless users' mouse hover on the bar or manually click it.
+}
+
+\subsection{environment}{
+
+\code{shinyCatch} uses the same environment as where it is called, it means if you
+assign a variable inside the expression, you can still get it from outside the
+\code{shinyCatch}, see examples.
 }
 }
 \examples{
 if(interactive()){
   ui <- fluidPage(
-    spsDepend("toastr"),
+    spsDepend("shinyCatch"), # optional
     h4("Run this example on your own computer to better understand exception
            catch and dual-end logging", class = "text-center"),
     column(
@@ -126,4 +145,7 @@ if(interactive()){
 shinyCatch(message("this message"))
 try({shinyCatch(stop("this error")); "no block"}, silent = TRUE)
 try({shinyCatch(stop("this error"), blocking_level = "error"); "blocked"}, silent = TRUE)
+# get variable from outside
+shinyCatch({my_val <- 123})
+my_val
 }
