@@ -1,6 +1,6 @@
-1e6bb9aa52f461d931f1aa0583549a76 *DESCRIPTION
-42b8b0b7044f354ed75a1121121a9086 *NAMESPACE
-ef61856055bc7fc6a50c569dabc5d99d *NEWS.md
+05dc86ca2b40163d1b7e967f1d1fac08 *DESCRIPTION
+6ea5fd6b71ae6c6c572fd527b738d10e *NAMESPACE
+18a893257b3224e01d919e9531c83f1d *NEWS.md
 ea08f343166562985af3b582ac444d89 *R/bs_components.R
 ba2b09f09d1207b32bfaa1831d0bebb3 *R/css_loader.R
 f48bfaaa52a24197d9a202709073b4aa *R/depend.R
@@ -8,12 +8,12 @@ f48bfaaa52a24197d9a202709073b4aa *R/depend.R
 e99c7ddb708340ba2164a589e1885614 *R/inputs.R
 e21ea7f3969c01f84d39d86c50aba3a7 *R/pg_pane.R
 e53ca849a9c0a38d1c2981fba223e7d1 *R/popover_tip.R
-db18f1814a219eeea0e91b60642f3909 *R/spsServerCollections.R
+86c33f373e9104e10b54da7104573c4c *R/spsServerCollections.R
 179f14ff9a6f0f00916995cb1fec1a69 *R/spsUIcollections.R
 65bc6b2646660409487ab0672108529c *R/sps_timeline.R
 36b5f80dd25028de869dfc09e775e54b *R/util.R
 b3c6cc7b43bc12dd58bdf505dabef72d *R/zzz.R
-3a046835e9388f668cbdb7978d7863e1 *README.md
+7d7972ec360b45a8daf8e79e38d5dec7 *README.md
 4ed847fc942659cd26618255d7e216bc *inst/assets/css/css_loader.css
 42cf79d0f68da880d51392766a84181d *inst/assets/css/font-awesome-animation.min.css
 4fa6cbf1915bb643d77e000e7f8906f1 *inst/assets/css/sps-comps.css
@@ -42,6 +42,7 @@ a7e8c22e2763d610cee1d08747fabbf0 *man/hexPanel.Rd
 af71df16b90622b190fb2ea657659d76 *man/hrefTab.Rd
 23321997c9873d57b40898f27da58fd3 *man/hrefTable.Rd
 e3e71fb5d48509bf49dd9a1ddbf12d18 *man/incRv.Rd
+85c0383cfba002da099dd42c17099e48 *man/onNextInput.Rd
 d456d03e7ca1a4f3891e210fa1510af1 *man/pgPaneUpdate.Rd
 9b867757fe65a88ede9975e4e34708a0 *man/renderDesc.Rd
 5cb290c279bc391dec8953b9a94f8275 *man/shinyCatch.Rd
