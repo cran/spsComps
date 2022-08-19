@@ -1,6 +1,6 @@
-05dc86ca2b40163d1b7e967f1d1fac08 *DESCRIPTION
+074e11bb20713c625e8e5c118b4a0eac *DESCRIPTION
 6ea5fd6b71ae6c6c572fd527b738d10e *NAMESPACE
-18a893257b3224e01d919e9531c83f1d *NEWS.md
+89c11413f47937cae349a0bfb714e562 *NEWS.md
 ea08f343166562985af3b582ac444d89 *R/bs_components.R
 ba2b09f09d1207b32bfaa1831d0bebb3 *R/css_loader.R
 f48bfaaa52a24197d9a202709073b4aa *R/depend.R
@@ -27,10 +27,10 @@ a7fd83331a36f3c008c5a9eb633a6c4b *inst/assets/js/sps_sweetalert.js
 bc7c1e7ac3a2cceffa149e39b4cdfab5 *inst/assets/js/sps_update_pg.js
 c187ff223ea9726d3819984a81529808 *inst/assets/js/sps_update_timeline.js
 0d6a5309b3f7810674c9f1bede434338 *inst/assets/js/sweetalert2_202105.js
-8f03664a361f9e9935360adba90790d4 *man/addLoader.Rd
+6b00e025c3d3aa787e778336a6da2bac *man/addLoader.Rd
 1fbad7e0d0aa78e780099722cd40c4db *man/animateAppend.Rd
 9528aedbe6b9389ae91821157f616311 *man/animateIcon.Rd
-60301234c863f6fef45281e33e54f791 *man/animateUI.Rd
+be1ad309fb5a1c2cf9fc386cacea7f9b *man/animateUI.Rd
 49944bf25700541c9e615c9eb491b78e *man/bsAlert.Rd
 1f6788ede3a1f6a52584132881f43784 *man/bsPopover.Rd
 414b2d4c7346ddcc7648c02802d6a74b *man/bsTooltip.Rd
@@ -40,9 +40,9 @@ bd887cd67b368ec18119bec0a7d44827 *man/gallery.Rd
 e171143aec927f49f199d1ed8fb0c4b2 *man/heightMatcher.Rd
 a7e8c22e2763d610cee1d08747fabbf0 *man/hexPanel.Rd
 af71df16b90622b190fb2ea657659d76 *man/hrefTab.Rd
-23321997c9873d57b40898f27da58fd3 *man/hrefTable.Rd
+dac1dcd81d4fc3614730e1befcff5966 *man/hrefTable.Rd
 e3e71fb5d48509bf49dd9a1ddbf12d18 *man/incRv.Rd
-85c0383cfba002da099dd42c17099e48 *man/onNextInput.Rd
+770b6d0b775fc5a5cc5cedd8deac79a8 *man/onNextInput.Rd
 d456d03e7ca1a4f3891e210fa1510af1 *man/pgPaneUpdate.Rd
 9b867757fe65a88ede9975e4e34708a0 *man/renderDesc.Rd
 5cb290c279bc391dec8953b9a94f8275 *man/shinyCatch.Rd
