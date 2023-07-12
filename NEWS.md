@@ -1,3 +1,18 @@
+# spsComps 0.3.3.0
+
+## Major
+
+-   New argument for tooltip and popover functions `click_inside`. This allows users to click inside the message, convenient for adding clickable content, such as links inside the message.
+
+## Minor
+
+-   Changed the way to append gallery enlargement modal. Now uses JS to append the container to end of body instead within the element, so issues like #4 would not happen.
+-   Changed the default triggering bootstrap tooltip and popover functions from "hover focus" to "hover", so this works better with buttons. When clicking on buttons with tips/popovers, the tips/popovers would not constantly exist after click.
+
+## Bug Fix
+
+-   Fix all font awesome missing icon names due to Font Awesome upgrade to 6.0.
+
 # spsComps 0.3.2.1
 
 ## Minor
